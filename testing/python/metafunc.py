@@ -1334,6 +1334,31 @@ class TestMetafuncFunctional(object):
         )
         assert expectederror in failures[0].longrepr.reprcrash.message
 
+    def test_pytest_parametrized_with_nodeid_parameter(self, testdir):
+        # pytest-repeat issue #21 https://github.com/pytest-dev/pytest-repeat/issues/21
+        testdir.makepyfile(
+            """
+                import pytest
+
+                @pytest.fixture(autouse=True)
+                def __bar(request):
+                    return request.param
+
+                def pytest_generate_tests(metafunc):
+                    metafunc.parametrize('__bar', [1], indirect=True)
+
+                class TestClass(object):
+                    @pytest.fixture(params=['param'])
+                    def foo(self, request):
+                        pass
+
+                    def test_foo(self, foo):
+                        pass
+            """
+        )
+        result = testdir.runpytest("test_pytest_parametrized_with_nodeid_parameter.py::TestClass::test_foo[param]")
+        result.assert_outcomes(passed=1)
+
 
 class TestMetafuncFunctionalAuto(object):
     """

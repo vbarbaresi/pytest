@@ -634,7 +634,7 @@ class Session(nodes.FSCollector):
                 has_matched = False
                 for x in rep.result:
                     # TODO: remove parametrized workaround once collection structure contains parametrization
-                    if x.name == name or x.name.split("[")[0] == name:
+                    if x.name == name or x.name.split("[")[0] in (name, name.split("[")[0]):
                         resultnodes.extend(self.matchnodes([x], nextnames))
                         has_matched = True
                 # XXX accept IDs that don't have "()" for class instances
